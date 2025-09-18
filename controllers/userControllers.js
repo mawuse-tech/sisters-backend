@@ -42,7 +42,7 @@ export const registerUsers = async (req, res, next) => {
     }
 
     try {
-        const user = await User.create(req.body);
+        const user = await User.create({firstName, lastName, email, password});
 
         const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: '1d'

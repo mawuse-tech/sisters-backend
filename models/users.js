@@ -33,18 +33,18 @@ const userSchema = new Schema({
         required: true,
     },
 
-    confirmPassword: {
-        type: String,
-        minlength: 5,
-        required: true,
+    // confirmPassword: {
+    //     type: String,
+    //     minlength: 5,
+    //     required: true,
 
-        validate: {
-            validator: function (value) {
-                return value === this.password
-            },
-            message: "password and confirm password should match"
-        }
-    },
+    //     validate: {
+    //         validator: function (value) {
+    //             return value === this.password
+    //         },
+    //         message: "password and confirm password should match"
+    //     }
+    // },
 
     role: {
         type: String,
@@ -52,9 +52,20 @@ const userSchema = new Schema({
         default: 'user'
     },
 
-    profilePice: {
-        type: String
+    linkedInLink: String,
+    
+    proffession: String,
+    bio: {
+        type: String,
+        minlength: [50, "Bio must be at least 50 characters"],
+        maxlength: [200, "Bio cannot exceed 200 characters"],
     },
+
+    lincense: {
+        type: [String]   //allows multiple files path 
+    },
+    profilePic: String,
+    isVolunteer: { type: Boolean, default: false },
 
     passwordResetToken: String,
     passwordResetTokenEpiry: Date
