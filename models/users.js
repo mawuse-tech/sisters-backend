@@ -65,9 +65,11 @@ const userSchema = new Schema({
         type: [String]   //allows multiple files path 
     },
     profilePic: String,
+
     isVolunteer: { type: Boolean, default: false },
 
     passwordResetToken: String,
+    
     passwordResetTokenEpiry: Date
 
 });
