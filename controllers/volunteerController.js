@@ -13,7 +13,7 @@ export const volunteerRegisterFuction = async (req, res, next) => {
         };
         if (!req.body.proffession) {
             {
-                const error = new Error('proffession is required')
+                const error = new Error('profession is required')
                 error.statusCode = 400
                 return next(error)
             }
@@ -60,6 +60,7 @@ export const volunteerRegisterFuction = async (req, res, next) => {
             success: true,
             statusCode: 200,
             message: "Volunteer profile created successfully",
+            volunteer
             
         })
     } catch (error) {
@@ -104,3 +105,33 @@ export const editProfile = async (req, res, next) => {
         next(error)
     }
 }
+
+//quit volunteering
+export const quitVolunteer = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.loggedInUser._id);
+
+    if (!user) {
+      return res.status(404).json({
+         success: false,
+          message: "User not found" });
+    }
+
+    user.isVolunteer = false; 
+    user.profilePic = undefined; // clearing volunteer data
+    user.lincense = undefined;
+    user.bio = undefined;
+    user.proffession = undefined;
+    user.linkedInLink = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "You have successfully quit volunteering",
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
