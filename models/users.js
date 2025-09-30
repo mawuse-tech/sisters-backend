@@ -53,7 +53,7 @@ const userSchema = new Schema({
     },
 
     linkedInLink: String,
-    
+
     proffession: String,
     bio: {
         type: String,
@@ -67,8 +67,18 @@ const userSchema = new Schema({
 
     isVolunteer: { type: Boolean, default: false },
 
+    availability: [
+        {
+            day: { type: String, required: true },
+            startTime: { type: String, required: true },
+            endTime: { type: String, required: true },
+        }
+    ],
+
+    // isAvailable: { type: Boolean, default: false },
+
     passwordResetToken: String,
-    
+
     passwordResetTokenEpiry: Date
 
 });
