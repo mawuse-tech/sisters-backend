@@ -1,8 +1,10 @@
 import express from 'express'
 import connectDatabase from './config/db.js'
 import cookieParser from 'cookie-parser';
-import userRoute from './route/userRoute.js'
+import userRoute from './route/userRoute.js';
+import volunteerRoute from './route/volunteerRoute.js'
 import { errorHandler } from './middleWare/errorHandler.js';
+import complaintRoute from './route/complaintRoute.js'
 import cors from 'cors';
 import path from 'path'
 const PORT = process.env.PORT || 6000
@@ -24,6 +26,8 @@ app.use(cors(
 ))
 
 app.use('/api/auth', userRoute );
+app.use('/api', volunteerRoute);
+app.use('/api', complaintRoute)
 
 app.use(errorHandler)
 

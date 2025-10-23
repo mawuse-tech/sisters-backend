@@ -56,7 +56,7 @@ export const registerUsers = async (req, res, next) => {
         res.status(201).json({
             success: true,
             statusCode: 200,
-            user,
+            // user,
         });
 
     } catch (error) {
@@ -107,12 +107,13 @@ export const Login = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             statusCode: 200,
-            user,
+            message: "user logged in successfuly",
+            //  user,
         })
 
 
     } catch (error) {
-
+     next(error)
     }
 
 };
@@ -149,9 +150,10 @@ export const forgotPassword = async (req, res, next) => {
             return next(error)
         };
 
-        const resetToken = user.createResetPasswordToken()
+        const resetToken = user.createResetPasswordToken()  //returns raw token
         user.save({ validateBeforeSave: false });
-
+     
+        //we send the raw token to the user with the link
         const resetPasswordLink = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`
         const subject = 'there has been a password reset requset. follow the link provided'
         const html = `<p>This is the reset link:</p> <a href="${resetPasswordLink}" target="_blank">Follow link</a>`;
@@ -220,33 +222,33 @@ export const resetPassword = async (req, res, next) => {
 
 export const isUserLoggedIn = async(req, res, next) => {
     try {
-        const userToken = req.cookies.token;
+    //     const userToken = req.cookies.token;
 
-    if(!userToken){
-        const error = new Error('You are not logged in, please login to have access to this page');
-            error.statusCode = 401;
-            return next(error)
-    };
+    // if(!userToken){
+    //     const error = new Error('You are not logged in, please login to have access to this page');
+    //         error.statusCode = 401;
+    //         return next(error)
+    // };
 
-    const decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
-    if(!decodedToken){
-            const error = new Error('token invalid');
-            error.statusCode = 401;
-            return next(error)
-        };
+    // const decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+    // if(!decodedToken){
+    //         const error = new Error('token invalid');
+    //         error.statusCode = 401;
+    //         return next(error)
+    //     };
 
-        const loggedInUser = await User.findById(decodedToken.id).select('-password'); //{_id: '36uwgiu', firstName: }
+    //     const loggedInUser = await User.findById(decodedToken.id).select('-password'); //{_id: '36uwgiu', firstName: }
 
-        if(!loggedInUser) {
-            const error = new Error('The user with this token does not exist');
-            error.statusCode = 401;
-            return next(error)
-        }
+    //     if(!loggedInUser) {
+    //         const error = new Error('The user with this token does not exist');
+    //         error.statusCode = 401;
+    //         return next(error)
+    //     }
 
         res.status(200).json({
             success: true,
             statusCode: 200,
-            loggedInUser
+            loggedInUser: req.loggedInUser
         })
     } catch (error) {
         next(error)

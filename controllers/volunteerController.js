@@ -1,5 +1,5 @@
+import { timeLogic } from "../helpers/reusableFuctions.js";
 import User from "../models/users.js"
-import moment from "moment";
 
 
 export const volunteerRegisterFuction = async (req, res, next) => {
@@ -63,7 +63,7 @@ export const volunteerRegisterFuction = async (req, res, next) => {
       success: true,
       statusCode: 200,
       message: "Volunteer profile created successfully",
-      volunteer
+      // volunteer
 
     })
   } catch (error) {
@@ -112,36 +112,6 @@ export const editProfile = async (req, res, next) => {
     next(error)
   }
 }
-
-//quit volunteering
-export const quitVolunteer = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.loggedInUser._id).select("-password -passwordResetToken -passwordResetTokenEpiry -__v");
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    user.isVolunteer = false;
-    user.profilePic = undefined; // clearing volunteer data
-    user.lincense = undefined;
-    user.bio = undefined;
-    user.proffession = undefined;
-    user.linkedInLink = undefined;
-
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: "You have successfully quit volunteering",
-      quitVolunteer: user
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 
 //available 
 export const setAvailability = async (req, res, next) => {
@@ -199,37 +169,6 @@ export const deleteAvailableSlot = async (req, res, next) => {
   }
 }
 
-//time and day logic. reuseable function
-export const timeLogic = (volunteers) => {
-  const now = moment()
-  const currentDay = now.format("dddd")
-  const currentTime = now.format("HH:mm") 
-
-  // If input is a single volunteer not array, wrap it in an array
-  const volunteerList = Array.isArray(volunteers) ? volunteers : [volunteers];
-
-  const result = volunteerList.map((volunteer) => {
-    let available = false
-
-    for (let slot of volunteer.availability) {
-      if (slot.day === currentDay) {
-        if (currentTime >= slot.startTime && currentTime <= slot.endTime) {
-          available = true;
-          break;
-        }
-      }
-    };
-
-    return {
-      ...volunteer.toObject(),
-      isAvailable: available,
-    };
-
-  });
-
-   return Array.isArray(volunteers) ? result : result[0];
-}
-
 
 //fetching all volunteers
 export const fetchAllVolunteers = async (req, res, next) => {
@@ -243,12 +182,12 @@ export const fetchAllVolunteers = async (req, res, next) => {
       });
     };
 
-    const volunteerAvailableTimeLogic = timeLogic(allVolunteers) 
+    // const volunteerAvailableTimeLogic = timeLogic(allVolunteers)
 
     res.status(200).json({
       success: true,
       message: "These are all volunteers",
-      volunteers: volunteerAvailableTimeLogic,
+      volunteers: allVolunteers,
     });
   } catch (error) {
     next(error)
@@ -269,8 +208,8 @@ export const getVolunteerProfile = async (req, res, next) => {
 
     const volunteerProfile = timeLogic(volunteer)
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       volunteerProfile
     });
   } catch (error) {
@@ -278,4 +217,54 @@ export const getVolunteerProfile = async (req, res, next) => {
   }
 };
 
+//query 
+export const fetchPerPage = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 4;
+    const skip = (page - 1) * limit;
+    const { proffession, available, search } = req.query;
 
+    const filter = { isVolunteer: true };
+
+    if (proffession) {
+      filter.proffession = proffession;
+    }
+
+    if (search) {
+  const regex = { $regex: search, $options: "i" };
+  filter.$or = [
+    { firstName: regex },
+    { lastName: regex },
+    { proffession: regex }
+  ];
+}
+
+
+    // Query using the filter
+    const [volunteers, totalVolunteers] = await Promise.all([
+      User.find(filter)
+        .select("-password -passwordResetToken -passwordResetTokenEpiry -__v")
+        .limit(limit)
+        .skip(skip),
+      User.countDocuments(filter),
+    ]);
+
+    let volunteerAvailableTimeLogic = timeLogic(volunteers);
+
+    //after volunteers have gone through the time logic, now we can access the available 
+    if (available === "true") {
+      volunteerAvailableTimeLogic = volunteerAvailableTimeLogic.filter(v => v.isAvailable);
+    }
+
+    res.status(200).json({
+      success: true,
+      volunteers: volunteerAvailableTimeLogic,
+      page,
+      totalVolunteers,
+      pages: Math.ceil(totalVolunteers / limit),
+    });
+  } catch (error) {
+    next(error);
+  }
+};

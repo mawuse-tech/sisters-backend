@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { model, Model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import crypto from 'crypto'
 
 const userSchema = new Schema({
