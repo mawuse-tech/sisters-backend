@@ -135,53 +135,48 @@ export const logout = async(req, res, next) => {
 
 //forgort password function
 export const forgotPassword = async (req, res, next) => {
-    try {
-        const { email } = req.body;
-        if (!email) {
-            const error = new Error('please input your email')
-            error.statusCode = 400
-            return next(error)
-        }
-        const user = await User.findOne({ email })
-
-        if (!user) {
-            const error = new Error('could not find user with given email')
-            error.statusCode = 404
-            return next(error)
-        };
-
-        const resetToken = user.createResetPasswordToken()  //returns raw token
-        user.save({ validateBeforeSave: false });
-     
-        //we send the raw token to the user with the link
-        const resetPasswordLink = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`
-        const subject = 'there has been a password reset requset. follow the link provided'
-        const html = `<p>This is the reset link:</p> <a href="${resetPasswordLink}" target="_blank">Follow link</a>`;
-
-
-        try {
-            sendMail({
-                email: user.email,
-                subject,
-                html
-            })
-
-            res.status(200).json({
-                success: true,
-                message: 'link sent to your email'
-
-            })
-        } catch (error) {
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpire = undefined;
-            user.save({ validateBeforeSave: true })
-            next(error)
-        }
-
-    } catch (error) {
-        next(error)
+  try {
+    const { email } = req.body;
+    if (!email) {
+      const error = new Error("please input your email");
+      error.statusCode = 400;
+      return next(error);
     }
 
+    const user = await User.findOne({ email });
+    if (!user) {
+      const error = new Error("could not find user with given email");
+      error.statusCode = 404;
+      return next(error);
+    }
+
+    const resetToken = user.createResetPasswordToken();
+    await user.save({ validateBeforeSave: false });
+
+    const resetPasswordLink = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`;
+    const subject = "Password Reset Request";
+    const html = `
+      <p>You requested a password reset.</p>
+      <p>Click the link below to set a new password:</p>
+      <a href="${resetPasswordLink}" target="_blank">${resetPasswordLink}</a>
+    `;
+
+    try {
+      await sendMail({ email: user.email, subject, html });
+
+      return res.status(200).json({
+        success: true,
+        message: "Reset link sent to your email",
+      });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: true });
+      return next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
 //reset password function

@@ -1,6 +1,7 @@
 import User from "../models/users.js";
 import Chat from "../models/chatSchema.js";
 
+//This function receives a chat message from the frontend, stores it in MongoDB, and then returns the saved message.
 export const sendMessage = async (req, res, next) => {
   try {
     const { senderId, receiverId, message } = req.body;
@@ -38,7 +39,7 @@ export const getChatPartners = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
-    // Step 1: Find all messages involving this user
+    // Step 1: Find all messages involving this user We search the Chat collection for all chats where the user is either the sender or receiver.
     const chats = await Chat.find({
       $or: [{ senderId: userId }, { receiverId: userId }],
     })
@@ -48,9 +49,9 @@ export const getChatPartners = async (req, res, next) => {
     // Step 2: Create a map to store last message per partner
     const partnerMap = new Map();
 
+    //For each message, we figure out who the partner is. if the logged-in user sent the message → partner is the receiver. If the logged-in user received the message →
     chats.forEach((chat) => {
-      const partnerId =
-        chat.senderId.toString() === userId ? chat.receiverId.toString() : chat.senderId.toString();
+      const partnerId = chat.senderId.toString() === userId ? chat.receiverId.toString() : chat.senderId.toString();
 
       // store only the latest message per partner
       if (!partnerMap.has(partnerId)) {

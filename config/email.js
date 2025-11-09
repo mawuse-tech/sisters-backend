@@ -1,22 +1,13 @@
-import nodemailer from 'nodemailer'
+// sendMail.js
+import { Resend } from 'resend';
 
-export const sendMail = async (Option) => {
-    const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        auth: {
-            user: process.env.EMAIL_USERNAME,
-            pass: process.env.EMAIL_PASSWORD
-        }
-    });
+export const sendMail = async ({ email, subject, html }) => {
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const mailOptions = {
-        from: 'Vogue IT Support<vogue@div>',
-        to: Option.email,
-        subject: Option.subject,
-        text: Option.message,
-        html: Option.html
-    }
-
-    await transporter.sendMail(mailOptions)
-}
+  await resend.emails.send({
+    from: 'Sisters App Acme <onboarding@resend.dev>', // You can use your domain or Resend provided domain
+    to: email,
+    subject,
+    html,
+  });
+};
