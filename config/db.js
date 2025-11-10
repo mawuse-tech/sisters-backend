@@ -9,3 +9,5 @@ function connectDatabase(){
 }
 
 export default connectDatabase
+
+    // "start": "node --watch --env-file=.env index.js"
