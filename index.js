@@ -29,12 +29,12 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // }));
 const allowedOrigins = [
   "http://localhost:5173",        // local dev
-  "https://esseauth.netlify.app"  // Netlify deployment
+  "https://sist.netlify.app"  // Netlify deployment
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow Thunder Client/Postman
+    if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
