@@ -11,6 +11,7 @@ export const routeProtect = async (req, res, next) => {
             return next(error)
         }
 
+        
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if(!decoded){
