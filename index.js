@@ -23,10 +23,28 @@ app.use(cookieParser());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // CORS setup
+// app.use(cors({
+//   origin: 'http://localhost:5173',
+//   credentials: true
+// }));
+const allowedOrigins = [
+  "http://localhost:5173",        // local dev
+  "https://esseauth.netlify.app"  // Netlify deployment
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow Thunder Client/Postman
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
+
 
 // HTTP + WebSocket server
 const server = http.createServer(app);
