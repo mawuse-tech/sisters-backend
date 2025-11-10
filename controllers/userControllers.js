@@ -42,7 +42,7 @@ export const registerUsers = async (req, res, next) => {
     }
 
     try {
-        const user = await User.create({firstName, lastName, email, password});
+        const user = await User.create({ firstName, lastName, email, password });
 
         const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: '1d'
@@ -96,13 +96,20 @@ export const Login = async (req, res, next) => {
         };
 
         const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "1d"
+            expiresIn: "7d"
         });
 
-        res.cookie('token', token, {
-            httpOnly: true, //avoid client side tempering
-            maxAge: 24 * 60 * 60 * 1000 //1 day
-        })
+        // res.cookie('token', token, {
+        //     httpOnly: true, //avoid client side tempering
+        //     maxAge: 24 * 60 * 60 * 1000 //1 day
+        // })
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,          // IMPORTANT for Netlify + Render HTTPS
+            sameSite: "none",      // IMPORTANT for cross-site cookies
+            maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days
+        });
 
         return res.status(200).json({
             success: true,
@@ -113,21 +120,21 @@ export const Login = async (req, res, next) => {
 
 
     } catch (error) {
-     next(error)
+        next(error)
     }
 
 };
 
 
 //logout
-export const logout = async(req, res, next) => {
+export const logout = async (req, res, next) => {
     try {
-        res.clearCookie('token') ;
+        res.clearCookie('token');
 
-    res.status(200).json({
-        success: true,
-        message: 'user loged out successfully'
-    })
+        res.status(200).json({
+            success: true,
+            message: 'user loged out successfully'
+        })
     } catch (error) {
         next(error)
     }
@@ -135,48 +142,48 @@ export const logout = async(req, res, next) => {
 
 //forgort password function
 export const forgotPassword = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      const error = new Error("please input your email");
-      error.statusCode = 400;
-      return next(error);
-    }
+    try {
+        const { email } = req.body;
+        if (!email) {
+            const error = new Error("please input your email");
+            error.statusCode = 400;
+            return next(error);
+        }
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      const error = new Error("could not find user with given email");
-      error.statusCode = 404;
-      return next(error);
-    }
+        const user = await User.findOne({ email });
+        if (!user) {
+            const error = new Error("could not find user with given email");
+            error.statusCode = 404;
+            return next(error);
+        }
 
-    const resetToken = user.createResetPasswordToken();
-    await user.save({ validateBeforeSave: false });
+        const resetToken = user.createResetPasswordToken();
+        await user.save({ validateBeforeSave: false });
 
-    const resetPasswordLink = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`;
-    const subject = "Password Reset Request";
-    const html = `
+        const resetPasswordLink = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`;
+        const subject = "Password Reset Request";
+        const html = `
       <p>You requested a password reset.</p>
       <p>Click the link below to set a new password:</p>
       <a href="${resetPasswordLink}" target="_blank">${resetPasswordLink}</a>
     `;
 
-    try {
-      await sendMail({ email: user.email, subject, html });
+        try {
+            await sendMail({ email: user.email, subject, html });
 
-      return res.status(200).json({
-        success: true,
-        message: "Reset link sent to your email",
-      });
+            return res.status(200).json({
+                success: true,
+                message: "Reset link sent to your email",
+            });
+        } catch (error) {
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+            await user.save({ validateBeforeSave: true });
+            return next(error);
+        }
     } catch (error) {
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpire = undefined;
-      await user.save({ validateBeforeSave: true });
-      return next(error);
+        next(error);
     }
-  } catch (error) {
-    next(error);
-  }
 };
 
 //reset password function
@@ -215,30 +222,30 @@ export const resetPassword = async (req, res, next) => {
 
 };
 
-export const isUserLoggedIn = async(req, res, next) => {
+export const isUserLoggedIn = async (req, res, next) => {
     try {
-    //     const userToken = req.cookies.token;
+        //     const userToken = req.cookies.token;
 
-    // if(!userToken){
-    //     const error = new Error('You are not logged in, please login to have access to this page');
-    //         error.statusCode = 401;
-    //         return next(error)
-    // };
+        // if(!userToken){
+        //     const error = new Error('You are not logged in, please login to have access to this page');
+        //         error.statusCode = 401;
+        //         return next(error)
+        // };
 
-    // const decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
-    // if(!decodedToken){
-    //         const error = new Error('token invalid');
-    //         error.statusCode = 401;
-    //         return next(error)
-    //     };
+        // const decodedToken = jwt.verify(userToken, process.env.JWT_SECRET);
+        // if(!decodedToken){
+        //         const error = new Error('token invalid');
+        //         error.statusCode = 401;
+        //         return next(error)
+        //     };
 
-    //     const loggedInUser = await User.findById(decodedToken.id).select('-password'); //{_id: '36uwgiu', firstName: }
+        //     const loggedInUser = await User.findById(decodedToken.id).select('-password'); //{_id: '36uwgiu', firstName: }
 
-    //     if(!loggedInUser) {
-    //         const error = new Error('The user with this token does not exist');
-    //         error.statusCode = 401;
-    //         return next(error)
-    //     }
+        //     if(!loggedInUser) {
+        //         const error = new Error('The user with this token does not exist');
+        //         error.statusCode = 401;
+        //         return next(error)
+        //     }
 
         res.status(200).json({
             success: true,
