@@ -6,7 +6,6 @@ import volunteerRoute from './route/volunteerRoute.js';
 import { errorHandler } from './middleWare/errorHandler.js';
 import complaintRoute from './route/complaintRoute.js';
 import cors from 'cors';
-import path from 'path';
 import http from 'http';
 import { initSocket } from './config/socket.js';
 import chatRoute from './route/chatRoute.js'
