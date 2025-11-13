@@ -10,6 +10,8 @@ import path from 'path';
 import http from 'http';
 import { initSocket } from './config/socket.js';
 import chatRoute from './route/chatRoute.js'
+import path, { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 
 const PORT = process.env.PORT || 6000;
@@ -55,6 +57,14 @@ app.use('/api/auth', userRoute);
 app.use('/api', volunteerRoute);
 app.use('/api', complaintRoute);
 app.use('/api/chats', chatRoute)
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+app.use(express.static(join(__dirname, 'dist')));
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(join(__dirname, 'dist', 'index.html'));
+});
 
 // Error handler
 app.use(errorHandler);
