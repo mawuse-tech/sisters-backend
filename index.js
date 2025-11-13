@@ -29,7 +29,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // }));
 const allowedOrigins = [
   "http://localhost:5173",        // local dev
-  "https://sist.netlify.app"  // Netlify deployment
+  "https://sisters-backend.onrender.com"  // Netlify deployment
 ];
 
 app.use(cors({
