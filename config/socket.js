@@ -4,7 +4,10 @@ import Chat from "../models/chatSchema.js";
 export const initSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "https://sisters-backend.onrender.com",
+      origin: [
+        "http://localhost:5173",
+        "https://sisters-backend.onrender.com"
+      ],
       credentials: true,
     },
   });

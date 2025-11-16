@@ -10,7 +10,6 @@ export const routeProtect = async (req, res, next) => {
             error.statusCode = 401;
             return next(error)
         }
-
         
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -21,6 +20,12 @@ export const routeProtect = async (req, res, next) => {
         }
 
         const user = await User.findById(decoded.id).select('-password'); //{_id: '36uwgiu', firstName: }
+        //  console.log(user)
+        if (!user) {
+            const error = new Error('User no longer exists');
+            error.statusCode = 401;
+            return next(error);
+        }
 
         req.loggedInUser = user;
 

@@ -47,13 +47,20 @@ export const volunteerRegisterFuction = async (req, res, next) => {
     volunteer.proffession = req.body.proffession;
     volunteer.bio = req.body.bio;
 
+    // if (req.files.profilePic) {
+    //   volunteer.profilePic = `uploads/${req.files.profilePic[0].filename}`
+    // };
+
+    // if (req.files.lincense) {
+    //   volunteer.lincense = req.files.lincense.map(file => `uploads/${file.filename}`);
+    // };
     if (req.files.profilePic) {
-      volunteer.profilePic = `uploads/${req.files.profilePic[0].filename}`
-    };
+      volunteer.profilePic = req.files.profilePic[0].path;  // Cloudinary URL
+    }
 
     if (req.files.lincense) {
-      volunteer.lincense = req.files.lincense.map(file => `uploads/${file.filename}`);
-    };
+      volunteer.lincense = req.files.lincense.map(file => file.path); // Array of Cloudinary URLs
+    }
 
     volunteer.isVolunteer = true;
 
@@ -63,7 +70,7 @@ export const volunteerRegisterFuction = async (req, res, next) => {
       success: true,
       statusCode: 200,
       message: "Volunteer profile created successfully",
-      // volunteer
+       volunteer
 
     })
   } catch (error) {
@@ -86,11 +93,11 @@ export const editProfile = async (req, res, next) => {
     findUser.bio = req.body?.bio || findUser.bio;
 
     if (req.files?.profilePic) {
-      findUser.profilePic = `uploads/${req.files.profilePic[0].filename}`
+      findUser.profilePic = req.files.profilePic[0].path
     };
 
     if (req.files?.lincense) {
-      findUser.lincense = req.files.lincense.map(file => `uploads/${file.filename}`);
+      findUser.lincense = req.files.lincense.map(file => file.path);
     };
 
     findUser.isVolunteer = true;
@@ -232,13 +239,13 @@ export const fetchPerPage = async (req, res, next) => {
     }
 
     if (search) {
-  const regex = { $regex: search, $options: "i" };
-  filter.$or = [
-    { firstName: regex },
-    { lastName: regex },
-    { proffession: regex }
-  ];
-}
+      const regex = { $regex: search, $options: "i" };
+      filter.$or = [
+        { firstName: regex },
+        { lastName: regex },
+        { proffession: regex }
+      ];
+    }
 
 
     // Query using the filter
