@@ -29,8 +29,12 @@ const userSchema = new Schema({
 
     password: {
         type: String,
-        minlength: 5,
         required: true,
+        minlength: 5, // keep your original minimum length
+        match: [
+            /^(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/,
+            "Password must contain at least 1 number and 1 special character"
+        ],
     },
 
     // confirmPassword: {

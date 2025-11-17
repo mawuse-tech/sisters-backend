@@ -160,7 +160,7 @@ export const forgotPassword = async (req, res, next) => {
         const resetToken = user.createResetPasswordToken();
         await user.save({ validateBeforeSave: false });
 
-        const resetPasswordLink = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`;
+        const resetPasswordLink = `${req.protocol}://process.env.FRONTEND_URL/resetpassword/${resetToken}`;
         const subject = "Password Reset Request";
         const html = `
       <p>You requested a password reset.</p>
