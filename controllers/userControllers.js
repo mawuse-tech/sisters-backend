@@ -207,7 +207,7 @@ export const resetPassword = async (req, res, next) => {
 
         //we then remove these from the database
         user.passwordResetToken = undefined
-        user.passwordResetTokenEpiry = undefined
+        user.passwordResetTokenExpiry = undefined
 
         //we save all these back to the data base as an updated user data
         await user.save();

@@ -83,7 +83,7 @@ const userSchema = new Schema({
 
     passwordResetToken: String,
 
-    passwordResetTokenEpiry: Date
+  passwordResetTokenExpiry: Date
 
 });
 
