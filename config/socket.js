@@ -6,7 +6,7 @@ export const initSocket = (server) => {
     cors: {
       origin: [
         "http://localhost:5173",
-        "https://sisters-backend.onrender.com"
+        "https://sisters-backend.fly.dev"
       ],
       credentials: true,
     },
