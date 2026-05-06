@@ -195,11 +195,11 @@ export const resetPassword = async (req, res, next) => {
     try {
         const user = await User.findOne({ passwordResetToken: encryptedToken, passwordResetTokenEpiry: { $gt: Date.now() } }); //compare the incoming hashed token to the one in the database 
 
-        // if (!user) {
-        //     const error = new Error('token has expired')
-        //     error.statusCode = 400
-        //     return next(error)
-        // };
+        if (!user) {
+            const error = new Error('token has expired')
+            error.statusCode = 400
+            return next(error)
+        };
 
         //when everything is a succuss, we replae the incoming password with the db password;
         user.password = req.body.password
