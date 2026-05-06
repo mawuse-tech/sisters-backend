@@ -193,7 +193,7 @@ export const resetPassword = async (req, res, next) => {
     const encryptedToken = crypto.createHash('sha256').update(token).digest('hex')//hash the raw token again
 
     try {
-        const user = await User.findOne({ passwordResetToken: encryptedToken, passwordResetTokenEpiry: { $gt: Date.now() } }); //compare the incoming hashed token to the one in the database 
+        const user = await User.findOne({ passwordResetToken: encryptedToken, passwordResetTokenExpiry: { $gt: Date.now() } }); //compare the incoming hashed token to the one in the database 
 
         if (!user) {
             const error = new Error('token has expired')
