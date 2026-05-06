@@ -30,7 +30,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // }));
 const allowedOrigins = [
   "http://localhost:5173",        // local dev
-  "https://sisters-backend.fly.dev/" 
+  "https://sisters-backend.fly.dev" 
 ];
 
 app.use(cors({
