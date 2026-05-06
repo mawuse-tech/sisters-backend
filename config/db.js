@@ -10,4 +10,5 @@ function connectDatabase(){
 
 export default connectDatabase
 
-    // "start": "node --watch --env-file=.env index.js"
+    //local "start": "node --watch --env-file=.env index.js"
+//    node index.js
